@@ -20,6 +20,10 @@ def horizontal_flip(im):
     im_flipped = im.copy()
     width, height = im.shape
     ## YOUR CODE HERE
+    # for loop reverse each row
+    im_flipped = [row[::-1] for row in im_flipped]
+
+    im_flipped= np.array(im_flipped, dtype=np.float32)
     return im_flipped
 
 
@@ -45,6 +49,25 @@ def region_avg(im, ic, jc, k=3):
         5.0
     """
     ## YOUR CODE HERE
+    height, width = im.shape
+    step = k // 2
+    row_start = max(ic - step, 0)
+    row_end = min(ic + step + 1, height)
+    col_start = max(jc - step, 0)
+    col_end = min(jc + step + 1, width)
+    # sum = 0
+    # count = 0
+    # for i in range(row_start, row_end):
+    #     for j in range(col_start, col_end):
+    #         if i < height and j < width:
+    #             sum += im[i, j]
+    #             count += 1
+    #can use splicing instead of for loops (faster)
+    region = im[row_start:row_end, col_start:col_end]
+    if region.size == 0:
+        mean_region = 0
+    else:
+        mean_region = np.mean(region)
     return mean_region
 
 
@@ -61,7 +84,12 @@ def blur(im, k=3):
 
     """
     ## YOUR CODE HERE
-    return im_blurred 
+    height, width = im.shape
+    im_blurred = np.zeros((height, width), dtype=np.float32)
+    for i in range(height):
+        for j in range(width):
+            im_blurred[i,j] = region_avg(im, i, j, k)
+    return im_blurred
 
 
 def region_median(im, ic, jc, k=3):
@@ -86,6 +114,14 @@ def region_median(im, ic, jc, k=3):
         5.0
     """
     ## YOUR CODE HERE
+    height, width = im.shape
+    step = k // 2
+    row_start = max(ic - step, 0)
+    row_end = min(ic + step + 1, height)
+    col_start = max(jc - step, 0)
+    col_end = min(jc + step + 1, width)
+    l = im[row_start:row_end, col_start:col_end]
+
     return np.median(l)
 
 
@@ -110,6 +146,11 @@ def denoise(im, k=3):
                [5, 5, 5]], dtype=uint8)
     """
     ## YOUR CODE HERE
+    height, width = im.shape
+    im_denoised = np.zeros((height, width), dtype=np.float32)
+    for i in range(height):
+        for j in range(width):
+            im_denoised[i, j] = region_median(im, i, j, k)
     return im_denoised
 
 
@@ -135,6 +176,7 @@ def thresholding(im, threshold=100):
                [  0, 255, 255]], dtype=uint8)
     """
     ## YOUR CODE HERE
+    im_th = np.array([[255 if i > threshold else 0 for i in row] for row in im])
     return im_th
 
 
@@ -159,9 +201,24 @@ def center_crop(im, x_size, y_size):
                [12, 13, 14],
                [17, 18, 19])
     """
+    width, height = im.shape
+    if x_size > width:
+        raise ValueError("Crop size width larger than image size")
+    if y_size > height:
+        raise ValueError("Crop size height larger than image size")
+    
     # Here is how you can define the center
     width, height = im.shape
     ic = width // 2
     jc = height // 2
     ## YOUR CODE HERE
+    row_start = ic - (x_size // 2)
+    #row_end = ic + (x_size // 2) failed pytest
+    col_start = jc - (y_size // 2)
+    #col_end = jc + (y_size // 2) failed pytest
+    row_end = row_start + x_size
+    col_end = col_start + y_size
+
+    im_cropped = im[row_start:row_end, col_start:col_end]
+
     return im_cropped
