@@ -7,12 +7,28 @@ def merge_alternately(word1, word2):
     Merges two input strings by alternating characters 
     from each string until one of the strings is exhausted,
     then appends the remaining characters of the other string to the result.
-    
+
     :type word1: str
     :type word2: str
     :rtype: str
     """
-    ## YOUR CODE HERE
+    # Convert to lists to use append
+    word1_list = list(word1)
+    word2_list = list(word2)
+    merged_word_list = []
+
+    # Alternate through word 1 and 2, removing each letter after appending to the merged word
+    # Utilizie fact that empty string returns false
+    while word1_list or word2_list:
+        if word1_list:
+            merged_word_list.append(word1_list.pop(0))
+        if word2_list:
+            merged_word_list.append(word2_list.pop(0))
+
+    # Now convert back to a string
+    merged_word = ''.join(merged_word_list)
+
+    return merged_word
 
 
 def gcd_of_strings(str1, str2):
@@ -26,35 +42,74 @@ def gcd_of_strings(str1, str2):
     :type str2: str
     :rtype: str
     """
-    ## YOUR CODE HERE
-       
+    # If concat they should be the same in either direction
+    if (str1 + str2) != (str2 + str1):
+        return ""
+
+    # If they are just the same then you have the gcd
+    if (str1 == str2):
+        return str1
+
+    # Otherwise find the longer string and pass it recursively
+    if len(str1) > len(str2):
+        return gcd_of_strings(str1[len(str2):], str2)
+    else:
+        return gcd_of_strings(str1, str2[len(str1):])
+
 
 def students_with_books(books, extra):
     """ Determine which students will have the highest number of books
     in the class after receiving extra books.
-    
+
     :type books: List[int]
     :type extra: int
     :rtype: List[bool]
     """
-    ## YOUR CODE HERE
+    #max errors on empty list so run this
+    if not books:
+        return []
+    # Get current most books
+    max_books = max(books)
+    # Go through list and check if
+    book_bool = [False] * len(books)
+    for i in range(len(books)):
+        if books[i] + extra >= max_books:
+            book_bool[i] = True
+        else:
+            book_bool[i] = False
+    return book_bool
+
 
 def two_sum(nums, target):
     """Find the indices of two numbers in the given list 
     that add up to the target value.
-    
+
     :type nums: List[int]
     :type target: int
     :rtype: List[int]
     """
-    ## YOUR CODE HERE
+    # utilize dictionary with indexes for single loop
+    values = {}
+    for i in range(len(nums)):
+        remainder = target - nums[i]
+        if remainder in values:
+            return [values[remainder], i]
+        values[nums[i]] = i
+    return None
+
 
 def move_zeroes(nums):
     """Move all zeroes to the end of the given list while maintaining
     the relative order of non-zero elements.
-    
+
     :type nums: List[int]
     :rtype: None Do not return anything, modify nums in-place instead.
     """
-    ## YOUR CODE HERE
-
+    #find every zero, and swap with the next value then iterate
+    zero_pos = 0
+    for i in range(len(nums)):
+        if nums[i] != 0:
+            temp = nums[i]
+            nums[i] = nums[zero_pos]
+            nums[zero_pos] = temp
+            zero_pos += 1
